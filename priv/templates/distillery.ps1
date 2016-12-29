@@ -24,7 +24,6 @@ function Test-ServiceIsInstalled
 function Get-BinaryInPath
 {
     param([string]$binaryname)
-
     $bin = Get-Command $binaryname -ErrorAction SilentlyContinue
 
     if($bin -ne $null)
