@@ -8,7 +8,9 @@ Param(
    [System.String]$Command
 )
 
-function Get-ServiceByName
+Set-Variable binaryNotFound -option Constant -value "No binary found"
+
+function Test-ServiceIsInstalled
 {
     param([string]$servicename)
     try
@@ -22,8 +24,18 @@ function Get-ServiceByName
 function Get-BinaryByName
 {
     param([string]$binaryname)
-    $bin = Get-Command $binaryname -ErrorAction SilentlyContinue
+    cd $env:ProgramFiles
+
+    # Can only use Get-ChildItem if binary is in Path.
+#    $bin = Get-ChildItem $binaryname -ErrorAction SilentlyContinue 
+#    if ($bin -ne $null)
+#    {
+#	$bin.Definition
+#    }
+#    else
+#    {
+#        $binaryNotFound
+#    }
 }
   
         
-write-host "Command: $Command"
