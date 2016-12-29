@@ -4,10 +4,18 @@ $sut = (Split-Path -Leaf $MyInvocation.MyCommand.Path).Replace(".Tests.", ".")
  
 Describe "distillery" {
     It "Should Be Able To Find A Service By Name" {
-    Get-ServiceByName "eventlog" | Should Be $true
+	Test-ServiceIsInstalled "eventlog" | Should Be $true
     }
 
     It "Should Not Find A Non-existent Service" {
-	Get-ServiceByName "NoSuchService" | Should Be $false
+	Test-ServiceIsInstalled "NoSuchService" | Should Be $false
+    }
+
+    It "Should Be Able To Find A Binary By Name"{
+	Get-BinaryByName "calc" | Should Be "c:\Windows\system32\calc.exe"
+    }
+
+    It "Should Return A Special Constant When A Binary Cannot Be Found" {
+	Get-BinaryByName "nosuchbin" | Should Be $binaryNotFound
     }
 }
