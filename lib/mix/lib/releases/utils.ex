@@ -14,8 +14,23 @@ defmodule Mix.Releases.Utils do
   """
   @spec template(atom | String.t, Keyword.t) :: {:ok, String.t} | {:error, String.t}
   def template(name, params \\ []) do
+    Path.join(["#{:code.priv_dir(:distillery)}", "templates", "#{name}.eex"])
+    |> template_path(params)
+  end
+
+  @doc """
+  Loads a template from the provided path
+  Any parameters provided are configured as bindings for the template
+
+  ## Example
+      iex> path = Path.join(["#{:code.priv_dir(:distillery)}", "templates", "erl_script.eex"])
+      ...> {:ok, contents} = #{__MODULE__}.template_path(path, [erts_vsn: "8.0"])
+      ...> String.contains?(contents, "erts-8.0")
+      true
+  """
+  @spec template_path(String.t, Keyword.t) :: {:ok, String.t} | {:error, String.t}
+  def template_path(template_path, params \\ []) do
     try do
-      template_path = Path.join(["#{:code.priv_dir(:distillery)}", "templates", "#{name}.eex"])
       {:ok, EEx.eval_file(template_path, params)}
     rescue
       e ->
@@ -62,6 +77,42 @@ defmodule Mix.Releases.Utils do
   """
   @spec erts_version() :: String.t
   def erts_version, do: "#{:erlang.system_info(:version)}"
+
+  @doc """
+  Verified that the ERTS path provided is the right one.
+  If no ERTS path is specified it's fine. Distillery will work out
+  the system ERTS
+  """
+  @spec validate_erts(String.t | nil | boolean) :: :ok | {:error, String.t}
+  def validate_erts(path) when is_binary(path) do
+    erts = case Path.join(path, "erts-*") |> Path.wildcard |> Enum.count do
+      0 -> {:error, "Missing erts-* directory"}
+      1 -> :ok
+      _ -> {:error, "Too many erts-* directory"}
+    end
+    bin = case File.exists?(Path.join(path, "bin")) do
+      false -> {:error, "Missing bin directory"}
+      true -> :ok
+    end
+    lib = case File.exists?(Path.join(path, "lib")) do
+      false -> {:error, "Missing lib directory"}
+      true -> :ok      
+    end
+    errors =
+      Enum.filter_map(
+        [erts, bin, lib],
+        fn (x) -> x != :ok end,
+        fn {:error, message} -> message end)
+    case Enum.empty?(errors) do
+      true -> :ok
+      false -> {:error ,
+        "Invalid ERTS path #{Path.expand(path)}\n" <> Enum.join(errors, "\n")}    
+    end    
+  end
+
+  def validate_erts(include_erts) when is_nil(include_erts) or is_boolean(include_erts) do
+    :ok
+  end
 
   @doc """
   Detects the version of ERTS in the given directory

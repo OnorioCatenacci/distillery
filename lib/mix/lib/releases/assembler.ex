@@ -24,6 +24,7 @@ defmodule Mix.Releases.Assembler do
     with {:ok, environment} <- select_environment(config),
          {:ok, release}     <- select_release(config),
          {:ok, release}     <- apply_environment(release, environment),
+         :ok                <- validate_configuration(release),
          {:ok, release}     <- apply_configuration(release, config),
          :ok                <- File.mkdir_p(release.profile.output_dir),
          {:ok, release}     <- Plugin.before_assembly(release),
@@ -68,6 +69,10 @@ defmodule Mix.Releases.Assembler do
     {:ok, %{r | :profile => profile}}
   end
 
+  def validate_configuration(%Release{version: _, profile: profile}) do
+    Utils.validate_erts(profile.include_erts)    
+  end
+
   # Applies global configuration options to the release profile
   def apply_configuration(%Release{version: current_version, profile: profile} = release, %Config{} = config) do
     config_path = case profile.config do
@@ -82,7 +87,7 @@ defmodule Mix.Releases.Assembler do
         release = %{release | :applications => release_apps}
         case config.is_upgrade do
           true ->
-            case config.upgrade_from do
+            case config.upgrade_from do 
               :latest ->
                 upfrom = case Utils.get_release_versions(release.profile.output_dir) do
                   [] -> :no_upfrom
@@ -273,7 +278,14 @@ defmodule Mix.Releases.Assembler do
         relfile = {:release,
                     {'#{release.name}', '#{release.version}'},
                     {:erts, '#{erts_vsn}'},
-                    Enum.map(apps, fn %App{name: name, vsn: vsn, start_type: start_type} ->
+                    apps
+                    |> Enum.with_index
+                    |> Enum.sort_by(fn
+                          {%App{name: :kernel}, _idx} -> -2
+                          {%App{name: :stdlib}, _idx} -> -1
+                          {%App{}, idx}               -> idx
+                       end)
+                    |> Enum.map(fn {%App{name: name, vsn: vsn, start_type: start_type}, _idx} ->
                       case start_type do
                         nil ->
                           {name, '#{vsn}'}
@@ -710,9 +722,9 @@ defmodule Mix.Releases.Assembler do
 
   defp get_code_paths(%Release{profile: %Profile{output_dir: output_dir}} = release) do
     release.applications
-    |> Enum.map(fn %App{name: name, vsn: version} ->
+    |> Enum.flat_map(fn %App{name: name, vsn: version, path: path} ->
       lib_dir = Path.join([output_dir, "lib", "#{name}-#{version}", "ebin"])
-      String.to_charlist(lib_dir)
+      [String.to_charlist(lib_dir), String.to_charlist(Path.join(path, "ebin"))]
     end)
   end
 
