@@ -21,21 +21,61 @@ function Test-ServiceIsInstalled
     catch{$false}
 }
 
-function Get-BinaryByName
+function Get-BinaryInPath
+{
+    param([string]$binaryname)
+
+    $bin = Get-Command $binaryname -ErrorAction SilentlyContinue
+
+    if($bin -ne $null)
+    {
+	$bin.Definition
+    }
+    else
+    {
+	$bin
+    }
+}
+
+function Get-BinaryInProgramFiles
 {
     param([string]$binaryname)
     cd $env:ProgramFiles
 
     # Can only use Get-ChildItem if binary is in Path.
-#    $bin = Get-ChildItem $binaryname -ErrorAction SilentlyContinue 
-#    if ($bin -ne $null)
-#    {
-#	$bin.Definition
-#    }
-#    else
-#    {
-#        $binaryNotFound
-#    }
+    $bin = Get-ChildItem $binaryname -ErrorAction SilentlyContinue -Recurse 
+    if ($bin -ne $null)
+    {
+	$bin.Definition
+    }
+    else
+    {
+        $bin
+    }
+}
+
+function Get-BinaryByName
+{
+    param([string]$binaryname)
+
+    $binInPath = Get-BinaryInPath($binaryname)
+
+    if ($binInPath -eq $null)
+    {
+	$binInProgramFiles = Get-BinaryInProgramFiles($binaryname)
+	if ($binInProgramFiles -eq $null)
+	{
+	    $binaryNotFound
+	}
+        else
+	{
+	    $binInProgramFiles
+	}
+    }
+    else
+    {
+	$binInPath
+    }
 }
   
         
