@@ -5,7 +5,7 @@
 Param(
    [Parameter(Position=0)]
    [ValidateSet('install','uninstall','start','stop','restart','ping','console','attach','list','usage')]
-   [System.String]$Command
+   [System.String]$Command="usage"
 )
 
 Set-Variable binaryNotFound -option Constant -value "No binary found"
@@ -79,3 +79,14 @@ function Get-BinaryByName
 }
   
         
+function Display-Usage
+{
+    $scriptName = Split-Path -Path $MyInvocation.ScriptName -Leaf
+    Write-Host "usage: $scriptName (install|uninstall|start|stop|restart|upgrade|downgrade|console|ping|list|attach)"
+    exit
+}
+
+if($Command -eq "usage")
+{
+    Display-Usage
+}
