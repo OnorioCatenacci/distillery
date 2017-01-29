@@ -48,7 +48,7 @@
 
         # For some checks, like AliasUsage, you can only customize the priority
         # Priority values are: `low, normal, high, higher`
-        {Credo.Check.Design.AliasUsage, priority: :low},
+        {Credo.Check.Design.AliasUsage, false},
 
         # For others you can set parameters
 
@@ -65,33 +65,33 @@
 
         {Credo.Check.Readability.FunctionNames},
         {Credo.Check.Readability.LargeNumbers},
-        {Credo.Check.Readability.MaxLineLength, priority: :low, max_length: 80},
+        {Credo.Check.Readability.MaxLineLength, priority: :low, max_length: 120, ignore_definitions: true, ignore_specs: true, ignore_strings: true},
         {Credo.Check.Readability.ModuleAttributeNames},
         {Credo.Check.Readability.ModuleDoc},
         {Credo.Check.Readability.ModuleNames},
-        {Credo.Check.Readability.NoParenthesesWhenZeroArity},
+        {Credo.Check.Readability.NoParenthesesWhenZeroArity, false},
         {Credo.Check.Readability.ParenthesesInCondition},
         {Credo.Check.Readability.PredicateFunctionNames},
         {Credo.Check.Readability.PreferImplicitTry},
         {Credo.Check.Readability.RedundantBlankLines},
         {Credo.Check.Readability.Specs},
-        {Credo.Check.Readability.StringSigils},
+        {Credo.Check.Readability.StringSigils, false},
         {Credo.Check.Readability.TrailingBlankLine},
         {Credo.Check.Readability.TrailingWhiteSpace},
         {Credo.Check.Readability.VariableNames},
         {Credo.Check.Refactor.DoubleBooleanNegation},
 
-        {Credo.Check.Refactor.ABCSize},
-        {Credo.Check.Refactor.CondStatements},
-        {Credo.Check.Refactor.CyclomaticComplexity},
-        {Credo.Check.Refactor.FunctionArity},
+        {Credo.Check.Refactor.ABCSize, false},
+        {Credo.Check.Refactor.CondStatements, false},
+        {Credo.Check.Refactor.CyclomaticComplexity, false},
+        {Credo.Check.Refactor.FunctionArity, max_arity: 8},
         {Credo.Check.Refactor.MatchInCondition},
         {Credo.Check.Refactor.NegatedConditionsInUnless},
         {Credo.Check.Refactor.NegatedConditionsWithElse},
-        {Credo.Check.Refactor.Nesting},
-        {Credo.Check.Refactor.PipeChainStart},
+        {Credo.Check.Refactor.Nesting, max_nesting: 4},
+        {Credo.Check.Refactor.PipeChainStart, false},
         {Credo.Check.Refactor.UnlessWithElse},
-        {Credo.Check.Refactor.VariableRebinding},
+        {Credo.Check.Refactor.VariableRebinding, false},
 
         {Credo.Check.Warning.BoolOperationOnSameValues},
         {Credo.Check.Warning.IExPry},
