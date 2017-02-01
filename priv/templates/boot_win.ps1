@@ -14,11 +14,16 @@ Set-Variable rel_vsn -option Constant -value "<%= rel_vsn %>"
 Set-Variable erts_vsn -option Constant -value "<%= erts_vsn %>"
 Set-Variable erl_opts  -option Constant -value "<%= erl_opts %>"
 
-function Fix-PathsWithSpaces
+function Fix-PathsWithLongNamesOrSpaces
 {
     param([string] $pathToFix)
     $pathParts = $pathToFix.Split([System.IO.Path]::DirectorySeparatorChar)
     #for each element in array if it contains a space, surround it with double quotes
+    #test for two things:
+    # Does the directory contain spaces 
+    # Is any portion of the directory longer than 8 characters
+
+    #If either of these is true, we need to wrap the path with double quotes
 }
 
 function Set-ReleaseRoot
