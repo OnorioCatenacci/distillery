@@ -3,7 +3,7 @@ defmodule Distillery.Mixfile do
 
   def project do
     [app: :distillery,
-     version: "1.0.0",
+     version: "1.1.0",
      elixir: "~> 1.3",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
@@ -11,6 +11,7 @@ defmodule Distillery.Mixfile do
      description: description(),
      package: package(),
      docs: docs(),
+     aliases: aliases(),
      test_coverage: [tool: ExCoveralls]]
   end
 
@@ -19,7 +20,7 @@ defmodule Distillery.Mixfile do
   defp deps do
     [{:ex_doc, "~> 0.13", only: [:dev]},
      {:excoveralls, "~> 0.6", only: [:dev, :test]},
-     {:credo, ">= 0.6.0-rc1", only: [:dev]},
+     {:credo, github: "bitwalker/credo", branch: "spec-fix", only: [:dev]},
      {:dialyze, "~> 0.2", only: [:dev]}]
   end
 
@@ -34,6 +35,9 @@ defmodule Distillery.Mixfile do
       licenses: ["MIT"],
       links: %{"Github": "https://github.com/bitwalker/distillery"}]
   end
+  defp aliases do
+    ["compile-check": "do compile, credo --strict"]
+  end
   defp docs do
     [main: "getting-started",
      extras: [
@@ -45,6 +49,7 @@ defmodule Distillery.Mixfile do
        "docs/Use With Phoenix.md",
        "docs/Phoenix Walkthrough.md",
        "docs/Upgrades and Downgrades.md",
+       "docs/Use With System D.md",
        "docs/Common Issues.md",
        "docs/Umbrella Projects.md",
        "docs/Overlays.md",
