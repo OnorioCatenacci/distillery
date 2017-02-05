@@ -1,6 +1,8 @@
-<# Discover the current release directory from the directory
-   of this script and the start_erl.data file
+<#
+ # Discover the current release directory from the directory
+ #  of this script and the start_erl.data file
 #>
+
 $script_dir=$PSScriptRoot
 $release_root_dir = Split-Path $script_dir -Parent
 
