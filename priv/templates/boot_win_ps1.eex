@@ -9,8 +9,8 @@ Param(
 )
 
 Set-Variable binaryNotFound -option Constant -value "No binary found"
-Set-Variable rel_name -option Constant -value "<%= rel_name %>"
-Set-Variable rel_vsn -option Constant -value "<%= rel_vsn %>"
+Set-Variable rel_name -option Constant -value "<%= release_name %>"
+Set-Variable rel_vsn -option Constant -value "<%= release_version %>"
 Set-Variable erts_vsn -option Constant -value "<%= erts_vsn %>"
 Set-Variable erl_opts  -option Constant -value "<%= erl_opts %>"
 
