@@ -316,7 +316,7 @@ defmodule Mix.Releases.Assembler do
     ps1_name = "#{release.name}.ps1"
     bin_dir         = Path.join(release.profile.output_dir, "bin")
     bootloader_path = Path.join(bin_dir, name)
-    bootloader_win_path = Path.join(bin_dir, "#{name}_loader.ps1")
+    bootloader_win_path = Path.join(bin_dir, "#{name}.ps1")
     boot_path       = Path.join(rel_dir, "#{name}.sh")
     boot_win_path   = Path.join(rel_dir, ps1_name)
     template_params = release.profile.overlay_vars
