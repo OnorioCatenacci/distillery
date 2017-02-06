@@ -8,4 +8,4 @@ $release_root_dir = Split-Path $script_dir -Parent
 
 $rel_vsn="<%= release_version %>"
 $boot_script="$release_root_dir\releases\$rel_vsn\<%= release_name %>.ps1"
-iex $boot_script $args[0]
+& $boot_script $args[0]
