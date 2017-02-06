@@ -143,7 +143,16 @@ function Display-Usage
     exit
 }
 
-if($Command -eq "usage")
+switch ($Command)
 {
-    Display-Usage
+  "usage"
+  {
+    Display-Usage;
+    break
+  }
+  "console"
+  {
+    Write-Host "Hit the console branch"
+    break;
+  }
 }
