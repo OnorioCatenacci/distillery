@@ -3,9 +3,7 @@
  #  of this script and the start_erl.data file
 #>
 
-$script_dir=$PSScriptRoot
-$release_root_dir = Split-Path $script_dir -Parent
+$release_root_dir = Split-Path $PSScriptRoot -Parent
 
-$rel_vsn="<%= release_version %>"
-$boot_script="$release_root_dir\releases\$rel_vsn\<%= release_name %>.ps1"
+$boot_script="$release_root_dir\releases\<%= release_version%>\<%= release_name %>.ps1"
 & $boot_script $args[0]
