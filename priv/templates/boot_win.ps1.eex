@@ -8,11 +8,32 @@ Param(
    [System.String]$Command="usage"
 )
 
+Set-Variable erts_vsn -option Constant -value "<%= erts_vsn %>"
+
+function Set-Bindir
+{
+  param([string] $releaseRoot)
+  $parentOfReleaseRoot = Split-Path $releaseRoot -Parent
+  $baseBinDir = Split-Path $parentOfReleaseRoot -Parent
+  "$baseBinDir\erts-$erts_vsn\bin"
+}
+
 Set-Variable binaryNotFound -option Constant -value "No binary found"
 Set-Variable rel_name -option Constant -value "<%= release_name %>"
 Set-Variable rel_vsn -option Constant -value "<%= release_version %>"
-Set-Variable erts_vsn -option Constant -value "<%= erts_vsn %>"
 Set-Variable erl_opts  -option Constant -value "<%= erl_opts %>"
+$bindir = Set-Bindir $PSScriptRoot
+Set-Variable werl -option Constant -value "$bindir\werl.exe"
+
+#Start here on 2/7/2017
+#set boot_script variable
+function Set-BootScriptVar
+{
+  if Test-Path "%rel_dir%\%rel_name%.boot" (
+  set boot_script=%rel_dir%\
+) else (
+  set boot_script=%rel_dir%\start
+)
 
 function Fix-PathsWithLongNamesOrSpaces
 {
@@ -32,6 +53,7 @@ function Set-ReleaseRoot
     $script_dir
 }
 
+
 function Find-ErtsDir
 {
     $release_root = Set-ReleaseRoot
@@ -39,33 +61,6 @@ function Find-ErtsDir
     Write-Host "$possible_erts_dir"
 
 }
-<#@set possible_erts_dir=%release_root_dir%\erts-%erts_vsn%
-@if exist "%possible_erts_dir%" (
-  call :set_erts_dir_from_default
-) else (
-  call :set_erts_dir_from_erl
-)
-@goto :eof
-
-:: Set the ERTS dir from the passed in erts_vsn
-:set_erts_dir_from_default
-@set erts_dir=%possible_erts_dir%
-@set rootdir=%release_root_dir%
-@goto :eof
-
-:: Set the ERTS dir from erl
-:set_erts_dir_from_erl
-@for /f "delims=" %%i in ('where erl') do @(
-  set erl=%%i
-)
-@set dir_cmd="%erl%" -noshell -eval "io:format(\"~s\", [filename:nativename(code:root_dir())])." -s init stop
-@for /f %%i in ('%%dir_cmd%%') do @(
-  set erl_root=%%i
-)
-@set erts_dir=%erl_root%\erts-%erts_vsn%
-@set rootdir=%erl_root%
-@goto :eof #>
-
 
 function Test-ServiceIsInstalled
 {
@@ -134,8 +129,14 @@ function Get-BinaryByName
 	$binInPath
     }
 }
-  
-        
+
+#Start a console
+function Execute-Console
+{
+  Invoke-Item "$rel_name console" $werl -boot "$boot_script" $sys_config  -args_file "$vm_args"
+}
+
+
 function Display-Usage
 {
     $scriptName = Split-Path -Path $MyInvocation.ScriptName -Leaf
