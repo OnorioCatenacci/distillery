@@ -27,13 +27,18 @@ Set-Variable werl -option Constant -value "$bindir\werl.exe"
 
 #Start here on 2/7/2017
 #set boot_script variable
+
 function Set-BootScriptVar
 {
-  if Test-Path "%rel_dir%\%rel_name%.boot" (
-  set boot_script=%rel_dir%\
-) else (
-  set boot_script=%rel_dir%\start
-)
+  $release_root = Set-ReleaseRoot
+  $release_dir = "$release_root\$rel_vsn"
+  if (Test-Path $release_dir\$rel_name.boot)
+  {
+       "$release_dir\"
+  } else {
+        "$release_dir\start"
+  }
+}
 
 function Fix-PathsWithLongNamesOrSpaces
 {
@@ -50,7 +55,7 @@ function Fix-PathsWithLongNamesOrSpaces
 function Set-ReleaseRoot
 {
     $script_dir = $PSScriptRoot
-    $script_dir
+    Split-Path $script_dir -Parent
 }
 
 
