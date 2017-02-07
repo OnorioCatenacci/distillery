@@ -5,5 +5,5 @@
 
 $release_root_dir = Split-Path $PSScriptRoot -Parent
 
-$boot_script="$release_root_dir\releases\<%= release_version%>\<%= release_name %>.ps1"
+$boot_script="$release_root_dir\releases\<%= release_version %>\<%= release_name %>.ps1"
 & $boot_script $args[0]
