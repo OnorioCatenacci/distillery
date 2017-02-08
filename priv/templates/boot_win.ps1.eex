@@ -135,10 +135,36 @@ function Get-BinaryByName
     }
 }
 
+function Set-SysConfig
+{
+   $releaseRoot = Set-ReleaseRoot
+   $possibleSysConfig = "$releaseRoot\$rel_vsn\sys.config"
+   $sysConfig = ""
+   if(Test-Path $possibleSysConfig)
+   {
+      $sysConfig = "-config $possibleSysConfig"
+   }
+   $sysConfig
+}
+   
+
+function Set-VmArgs
+{
+   $releaseRoot = Set-ReleaseRoot
+   "$releaseRoot\vm.args"
+}
+
+
 #Start a console
 function Execute-Console
 {
-  Invoke-Item "$rel_name console" $werl -boot "$boot_script" $sys_config  -args_file "$vm_args"
+    $boot_script = Set-BootScriptVar
+    $sys_config = Set-SysConfig
+    $vm_args = Set-VmArgs
+
+    $cmdLine = $($rel_name) console $($werl) -boot $(Set-BootScriptVar) $(Set-SysConfig) -args_file $(Set-VmArgs)
+ 
+    & $cmdLine
 }
 
 
