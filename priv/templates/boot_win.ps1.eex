@@ -10,6 +10,13 @@ Param(
 
 Set-Variable erts_vsn -option Constant -value "<%= erts_vsn %>"
 
+function Set-Root
+{
+  param([string] $scriptDir)
+  $parentOfScriptDir = Split-Path $scriptDir -Parent
+  Split-Path $parentOfScriptDir -Parent
+}
+
 function Set-Bindir
 {
   param([string] $releaseRoot)
@@ -24,6 +31,7 @@ Set-Variable rel_vsn -option Constant -value "<%= release_version %>"
 Set-Variable erl_opts  -option Constant -value "<%= erl_opts %>"
 $bindir = Set-Bindir $PSScriptRoot
 Set-Variable werl -option Constant -value "$bindir\werl.exe"
+$env:ROOT = Set-Root $PSScriptRoot
 
 #Start here on 2/7/2017
 #set boot_script variable
@@ -34,10 +42,11 @@ function Set-BootScriptVar
   $release_dir = "$release_root\$rel_vsn"
   if (Test-Path $release_dir\$rel_name.boot)
   {
-       "$release_dir\"
+       "$release_dir\$rel_name.boot"
   } else {
-        "$release_dir\start"
-  }
+        "$release_dir\start_clean.boot"
+      }
+    "$release_dir\start_clean.boot"
 }
 
 function Fix-PathsWithLongNamesOrSpaces
@@ -151,7 +160,7 @@ function Set-SysConfig
 function Set-VmArgs
 {
    $releaseRoot = Set-ReleaseRoot
-   "$releaseRoot\vm.args"
+   "$releaseRoot\$rel_vsn\vm.args"
 }
 
 
@@ -162,9 +171,9 @@ function Execute-Console
     $sys_config = Set-SysConfig
     $vm_args = Set-VmArgs
 
-    $cmdLine = $($rel_name) console $($werl) -boot $(Set-BootScriptVar) $(Set-SysConfig) -args_file $(Set-VmArgs)
+    $cmdLine =  "$($werl) -boot $(Set-BootScriptVar) $(Set-SysConfig) -args_file $(Set-VmArgs)"
  
-    & $cmdLine
+    iex $cmdLine
 }
 
 
@@ -185,6 +194,7 @@ switch ($Command)
   "console"
   {
     Write-Host "Hit the console branch"
+    Execute-Console
     break;
   }
 }
