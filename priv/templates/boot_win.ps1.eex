@@ -32,6 +32,7 @@ Set-Variable erl_opts  -option Constant -value "<%= erl_opts %>"
 $bindir = Set-Bindir $PSScriptRoot
 Set-Variable werl -option Constant -value "$bindir\werl.exe"
 $env:ROOT = Set-Root $PSScriptRoot
+$env:PATH = "$env:ROOT/lib/kernel-5.1.1/ebin; $env:ROOT/lib/stdlib-3.2/ebin;"+$env:PATH
 
 #Start here on 2/7/2017
 #set boot_script variable
