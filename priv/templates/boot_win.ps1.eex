@@ -28,6 +28,7 @@ function Set-Bindir
 Set-Variable binaryNotFound -option Constant -value "No binary found"
 Set-Variable rel_name -option Constant -value "<%= release_name %>"
 Set-Variable rel_vsn -option Constant -value "<%= release_version %>"
+Set-Variable service_name -option Constant -value "<%= release_name %>_<%= release_version %>"
 Set-Variable erl_opts  -option Constant -value "<%= erl_opts %>"
 $bindir = Set-Bindir $PSScriptRoot
 Set-Variable werl -option Constant -value "$bindir\werl.exe"
@@ -164,6 +165,7 @@ function Set-VmArgs
    "$releaseRoot\$rel_vsn\vm.args"
 }
 
+  
 
 #Start a console
 function Execute-Console
@@ -177,6 +179,19 @@ function Execute-Console
     iex $cmdLine
 }
 
+function Execute-Install
+{
+  if(Test-ServiceIsInstalled $service_name)
+  {
+    return;
+  }
+}
+
+
+function Execute-Uninstall
+{
+  return;
+}
 
 function Display-Usage
 {
@@ -192,10 +207,25 @@ switch ($Command)
     Display-Usage;
     break
   }
+
   "console"
   {
     Write-Host "Hit the console branch"
     Execute-Console
+    break;
+  }
+
+  "install"
+  {
+    Write-Host "Hit the install branch"
+    Execute-Install
+    break;
+  }
+
+  "uninstall"
+  {
+    Write-Host "Hit the uninstall branch"
+    Execute-Uninstall
     break;
   }
 }

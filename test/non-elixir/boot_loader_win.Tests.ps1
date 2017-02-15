@@ -1,6 +1,12 @@
+#copy the eex files to the ps1 names
 $here = Split-Path -Parent $MyInvocation.MyCommand.Path
-$sut = (Split-Path -Leaf $MyInvocation.MyCommand.Path).Replace(".Tests.", ".")
-. "$here\$sut"
+$testPath = "$here\..\..\priv\templates"
+
+$template = "$testPath\boot_loader_win.ps1.eex"
+cp $template "$testPath\boot_loader_win.ps1"
+$sut = "$testPath\boot_loader_win.ps1"
+
+. "$sut"
  
 Describe "distillery" {
     It "Should Be Able To Find A Service By Name" {
