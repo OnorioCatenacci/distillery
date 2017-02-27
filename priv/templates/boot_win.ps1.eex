@@ -8,15 +8,6 @@ Param(
    [System.String]$Command="usage"
 )
 
-Set-Variable erts_vsn -option Constant -value "<%= erts_vsn %>"
-
-function Set-Root
-{
-  param([string] $scriptDir)
-  $parentOfScriptDir = Split-Path $scriptDir -Parent
-  Split-Path $parentOfScriptDir -Parent
-}
-
 function Set-Bindir
 {
   param([string] $releaseRoot)
@@ -25,13 +16,42 @@ function Set-Bindir
   "$baseBinDir\erts-$erts_vsn\bin"
 }
 
-Set-Variable binaryNotFound -option Constant -value "No binary found"
 Set-Variable rel_name -option Constant -value "<%= release_name %>"
 Set-Variable rel_vsn -option Constant -value "<%= release_version %>"
-Set-Variable service_name -option Constant -value "<%= release_name %>_<%= release_version %>"
+Set-Variable erts_vsn -option Constant -value "<%= erts_vsn %>"
 Set-Variable erl_opts  -option Constant -value "<%= erl_opts %>"
+Set-Variable progname -option Constant -value "erl.exe"
 $bindir = Set-Bindir $PSScriptRoot
+Set-Variable erlsrv -option Constant -value "$bindir\erlsrv.exe"
+Set-Variable epmd -option Constant -value "$bindir\epmd.exe"
+Set-Variable escript -option Constant -value "$bindir\escript.exe"
 Set-Variable werl -option Constant -value "$bindir\werl.exe"
+
+function Set-RelDir
+{
+  param([string] $scriptDir)
+  $release_root_dir = Split-Path $scriptDir -Parent
+  "$release_root_dir\\releases\\$rel_vsn"
+}
+
+function Set-Root
+{
+  param([string] $scriptDir)
+  $parentOfScriptDir = Split-Path $scriptDir -Parent
+  Split-Path $parentOfScriptDir -Parent
+}
+
+<# function Set-Bindir
+{
+  param([string] $releaseRoot)
+  $parentOfReleaseRoot = Split-Path $releaseRoot -Parent
+  $baseBinDir = Split-Path $parentOfReleaseRoot -Parent
+  "$baseBinDir\erts-$erts_vsn\bin"
+} #>
+
+Set-Variable binaryNotFound -option Constant -value "No binary found"
+Set-Variable service_name -option Constant -value "<%= release_name %>_<%= release_version %>"
+$bindir = Set-Bindir $PSScriptRoot
 $env:ROOT = Set-Root $PSScriptRoot
 $env:PATH = "$env:ROOT/lib/kernel-5.1.1/ebin; $env:ROOT/lib/stdlib-3.2/ebin;"+$env:PATH
 
@@ -74,8 +94,7 @@ function Find-ErtsDir
 {
     $release_root = Set-ReleaseRoot
     $possible_erts_dir = "$release_root\erts-$erts_vsn"
-    Write-Host "$possible_erts_dir"
-
+    $possible_erts_dir
 }
 
 function Test-ServiceIsInstalled
@@ -172,6 +191,7 @@ function Execute-Console
 {
     $boot_script = Set-BootScriptVar
     $sys_config = Set-SysConfig
+
     $vm_args = Set-VmArgs
 
     $cmdLine =  "$($werl) -boot $(Set-BootScriptVar) $(Set-SysConfig) -args_file $(Set-VmArgs)"
@@ -185,6 +205,11 @@ function Execute-Install
   {
     return;
   }
+  else
+    {
+      $start_erl = "$(Find-ErtsDir)\bin\start_erl.exe"
+      return;
+    }  
 }
 
 
