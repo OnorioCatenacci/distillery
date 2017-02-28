@@ -26,12 +26,19 @@ Set-Variable erlsrv -option Constant -value "$bindir\erlsrv.exe"
 Set-Variable epmd -option Constant -value "$bindir\epmd.exe"
 Set-Variable escript -option Constant -value "$bindir\escript.exe"
 Set-Variable werl -option Constant -value "$bindir\werl.exe"
+function Set-ReleaseRoot
+{
+    $script_dir = $PSScriptRoot
+    Split-Path $script_dir -Parent
+}
+$release_root_dir = Set-ReleaseRoot 
+Set-Variable nodetool -option Constant -value "$release_root_dir\\releases\\$rel_vsn"
 
 function Set-RelDir
 {
   param([string] $scriptDir)
   $release_root_dir = Split-Path $scriptDir -Parent
-  "$release_root_dir\\releases\\$rel_vsn"
+  "$release_root_dir\releases\$rel_vsn"
 }
 
 function Set-Root
@@ -41,17 +48,8 @@ function Set-Root
   Split-Path $parentOfScriptDir -Parent
 }
 
-<# function Set-Bindir
-{
-  param([string] $releaseRoot)
-  $parentOfReleaseRoot = Split-Path $releaseRoot -Parent
-  $baseBinDir = Split-Path $parentOfReleaseRoot -Parent
-  "$baseBinDir\erts-$erts_vsn\bin"
-} #>
-
 Set-Variable binaryNotFound -option Constant -value "No binary found"
 Set-Variable service_name -option Constant -value "<%= release_name %>_<%= release_version %>"
-$bindir = Set-Bindir $PSScriptRoot
 $env:ROOT = Set-Root $PSScriptRoot
 $env:PATH = "$env:ROOT/lib/kernel-5.1.1/ebin; $env:ROOT/lib/stdlib-3.2/ebin;"+$env:PATH
 
@@ -83,12 +81,14 @@ function Fix-PathsWithLongNamesOrSpaces
     #If either of these is true, we need to wrap the path with double quotes
 }
 
-function Set-ReleaseRoot
+function Get-NodeAndCookieFromVMArgs
 {
-    $script_dir = $PSScriptRoot
-    Split-Path $script_dir -Parent
+  param([string]$VMArgFile)
+  $node_type = Get-Content -Path $VMArgFile | Where-Object ($_ -like '-name')
+  $node_name = Get-Content -Path $VMArgFile | Where-Object ($_ -like '-sname')
+  $cookie = Get-Content -Path $VMArgFile | Where-Object ($_ -like '-setcookie')
+  $node_type, $node_name, $cookie
 }
-
 
 function Find-ErtsDir
 {
