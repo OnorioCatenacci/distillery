@@ -26,6 +26,9 @@ Set-Variable erlsrv -option Constant -value "$bindir\erlsrv.exe"
 Set-Variable epmd -option Constant -value "$bindir\epmd.exe"
 Set-Variable escript -option Constant -value "$bindir\escript.exe"
 Set-Variable werl -option Constant -value "$bindir\werl.exe"
+Set-Variable node_type -option Constant -value "<%= release_name %>@127.0.0.1"
+Set-Variable node_name -option Constant -value "<%= release_name %>"
+Set-Variable cookie -option Constant -value "<%= release.profile.cookie %>"
 function Set-ReleaseRoot
 {
     $script_dir = $PSScriptRoot
