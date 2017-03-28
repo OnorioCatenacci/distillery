@@ -56,8 +56,6 @@ Set-Variable service_name -option Constant -value "<%= release_name %>_<%= relea
 $env:ROOT = Set-Root $PSScriptRoot
 $env:PATH = "$env:ROOT/lib/kernel-5.1.1/ebin; $env:ROOT/lib/stdlib-3.2/ebin;"+$env:PATH
 
-#Start here on 2/7/2017
-#set boot_script variable
 
 function Set-BootScriptVar
 {
@@ -93,12 +91,26 @@ function Get-NodeAndCookieFromVMArgs
   $node_type, $node_name, $cookie
 }
 
+#Start here
+# 29 March 2017
+# Not returning correct ERTS dir.
 function Find-ErtsDir
 {
     $release_root = Set-ReleaseRoot
     $possible_erts_dir = "$release_root\erts-$erts_vsn"
     $possible_erts_dir
 }
+
+function Write-ErlIni
+{
+  $erl_ini = "$(Find-ErtsDir)\bin\erl.ini"
+  $bindir = "$(Set-BinDir)".Replace("\","\\")
+  $rootdir = "$(Set-RootDir)".Replace("\","\\")
+  "[erlang]" | Out-File $erl_ini
+  "Bindir=$bindir" | Out-File $erl_ini
+  "Progname=$progname" | Out-File $erl_ini
+  "Rootdir=$rootdir" | Out-File $erl_ini
+}  
 
 function Test-ServiceIsInstalled
 {
