@@ -91,21 +91,27 @@ function Get-NodeAndCookieFromVMArgs
   $node_type, $node_name, $cookie
 }
 
-#Start here
-# 29 March 2017
-# Not returning correct ERTS dir.
 function Find-ErtsDir
 {
     $release_root = Set-ReleaseRoot
     $possible_erts_dir = "$release_root\erts-$erts_vsn"
-    $possible_erts_dir
+    if(Test-Path $possible_erts_dir)
+    {
+      [System.Tuple]::Create($possible_erts_dir,$release_root)
+    }
+    else
+    {
+      $erl_exe = gcm erl
+      $erl_root = & $erl_exe -noshell -eval 'io:format(\"~s\", [filename:nativename(code:root_dir())])." -s init stop'
+      [System.Tuple]::Create("$erl_root\erts-$erts_vsn","$erl_root")
+    }
 }
 
 function Write-ErlIni
 {
-  $erl_ini = "$(Find-ErtsDir)\bin\erl.ini"
+  $erl_ini = "$((Find-ErtsDir).Item1)\bin\erl.ini"
   $bindir = "$(Set-BinDir)".Replace("\","\\")
-  $rootdir = "$(Set-RootDir)".Replace("\","\\")
+  $rootdir = "$((Find-ErtsDir).Item2)".Replace("\","\\")
   "[erlang]" | Out-File $erl_ini
   "Bindir=$bindir" | Out-File $erl_ini
   "Progname=$progname" | Out-File $erl_ini
